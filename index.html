@@ -111,29 +111,47 @@
 </div>
 <a class="btn" href="#top" onclick="back(event)" style="margin-top:15px">⌂ Back to Website</a></div></section>
 <script>
-let pack=0,price=0,ship=250;const ds=[...document.querySelectorAll('.deal')];
+let pack=0,price=0,ship=250;
+const MEEOW_SHEET_URL='https://script.google.com/macros/s/AKfycbxkOv6uoEs5qvgZCom_69EuwwkwqB-C-QI4EkRWjhIzBb4E-Qmwo5H-WmL4UBYQhbtyJQ/exec';const ds=[...document.querySelectorAll('.deal')];
 function up(){if(!pack){chosen.textContent='⭐ Please select a bundle first';q.textContent='—';sub.textContent='Rs. 0';total.textContent='Rs. 0';submit.textContent='SELECT A BUNDLE FIRST →';return}chosen.textContent='⭐ Buy '+pack+' Pack'+(pack>1?'s':'')+' — Rs. '+price.toLocaleString();q.textContent=pack;sub.textContent='Rs. '+price.toLocaleString();total.textContent='Rs. '+(price+ship).toLocaleString();submit.textContent='PLACE ORDER — RS. '+(price+ship).toLocaleString()+' →'}
 ds.forEach(d=>d.onclick=()=>{ds.forEach(x=>x.classList.remove('active'));d.classList.add('active');pack=+d.dataset.p;price=+d.dataset.v;up();order.scrollIntoView({behavior:'smooth'})});
 minus.onclick=()=>{if(pack>1){let d=ds.find(x=>+x.dataset.p===pack-1);d.click()}};plus.onclick=()=>{if(pack>=1&&pack<4){let d=ds.find(x=>+x.dataset.p===pack+1);d.click()}};
 form.onsubmit=e=>{
  e.preventDefault();
  let ph=phone.value.replace(/\D/g,'');
- if(!pack){alert('Please select a bundle before placing your order.');document.getElementById('deals').scrollIntoView({behavior:'smooth'});return}
- if(!/^03\d{9}$/.test(ph)){alert('Please enter a valid Pakistani mobile number.');return}
+ if(!pack){
+   alert('Please select a bundle before placing your order.');
+   document.getElementById('deals').scrollIntoView({behavior:'smooth'});
+   return
+ }
+ if(!/^03\d{9}$/.test(ph)){
+   alert('Please enter a valid Pakistani mobile number.');
+   return
+ }
+
+ const orderData = new URLSearchParams();
+ orderData.append('name', document.getElementById('name')?.value || '');
+ orderData.append('phone', ph);
+ orderData.append('address', document.getElementById('address')?.value || '');
+ orderData.append('landmark', document.getElementById('landmark')?.value || '');
+ orderData.append('city', document.getElementById('city')?.value || '');
+ orderData.append('deal', 'Buy '+pack+' Pack'+(pack>1?'s':'')+' — Rs. '+price.toLocaleString());
+ orderData.append('price', String(price));
+ orderData.append('delivery', String(ship));
+ orderData.append('total', String(price+ship));
+
  fbq('track','Purchase',{value:price,currency:'PKR'});
- let dealText='Buy '+pack+' Pack'+(pack>1?'s':'');
- tb.textContent=dealText;
- tyDeal.textContent=dealText;
- tyPrice.textContent='Rs. '+price.toLocaleString();
+ tb.textContent='Buy '+pack+' Pack'+(pack>1?'s':'');
  tt.textContent='Rs. '+(price+ship).toLocaleString();
- tyName.textContent=document.getElementById('name').value;
- tyPhone.textContent=document.getElementById('phone').value;
- tyAddress.textContent=document.getElementById('address').value;
- tyLandmark.textContent=document.getElementById('landmark').value || '—';
- tyCity.textContent=document.getElementById('city').value;
- let heroImg=document.querySelector('.hero img');
- if(heroImg) tyProductImg.src=heroImg.src;
  document.getElementById('processing').style.display='flex';
+
+ fetch(MEEOW_SHEET_URL,{
+   method:'POST',
+   mode:'no-cors',
+   headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+   body:orderData.toString()
+ }).catch(()=>{});
+
  setTimeout(()=>{
    document.getElementById('processing').style.display='none';
    document.body.classList.add('ty');
