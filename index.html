@@ -143,25 +143,13 @@ form.onsubmit=e=>{
 };
 function back(e){
  e.preventDefault();
- // Return to website and completely clear the previous order
  document.body.classList.remove('ty');
- document.getElementById('orderForm').reset();
+ document.getElementById('form').reset();
  pack=0;
  price=0;
  ds.forEach(x=>x.classList.remove('active'));
- // Clear all previous order/customer details shown on Thank You page
- tb.textContent='Buy 1 Pack';
- tyDeal.textContent='—';
- tyPrice.textContent='Rs. 0';
- tt.textContent='Rs. 0';
- tyName.textContent='';
- tyPhone.textContent='';
- tyAddress.textContent='';
- tyLandmark.textContent='';
- tyCity.textContent='';
- tyProductImg.removeAttribute('src');
  up();
- history.replaceState(null,'','#top');
- window.scrollTo({top:0,behavior:'smooth'});
+ history.replaceState(null,'','#order');
+ setTimeout(()=>document.getElementById('order').scrollIntoView({behavior:'smooth'}),50);
 }
 </script></body></html>
